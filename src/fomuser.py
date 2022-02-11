@@ -163,6 +163,16 @@ class CLI:
         print("-"*80)
         print('\n'.join(formattedList))
 
+    def addUser(self, userid, forestclient):
+        """recieves a key cloak user id, verifies that it exists
+
+        :param userid: [description]
+        :type userid: [type]
+        :param forestclient: [description]
+        :type forestclient: [type]
+        """
+        pass
+
 
 
 
