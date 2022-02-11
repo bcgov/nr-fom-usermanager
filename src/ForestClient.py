@@ -22,14 +22,12 @@ class ForestClient:
     def forestClientIdExists(self, clientId):
         return self.fc_git.forestClientIdExists(clientId)
 
-
-
-
 class ForestClientFromGit:
 
     def __init__(self):
         self.fcTable = constants.FOREST_CLIENT_IN_GIT
         self.forestClientData = None
+        self.fcUtil = ForestClientUtil()
         #self.parse()
 
     def parse(self):
@@ -52,7 +50,7 @@ class ForestClientFromGit:
                 line = line.replace('(', '').replace(')', '').strip()
                 line = line.replace(', ', ',').replace("'", '')
                 lineList = line.split(',')
-                forestClientId = self.getPaddedForestClientID(lineList[0])
+                forestClientId = self.fcUtil.getPaddedForestClientID(lineList[0])
                 forestClientDict[lineList[1]] = forestClientId
         self.forestClientData = forestClientDict
         LOGGER.debug(f"number forest clients = {len(self.forestClientData)}")
@@ -66,11 +64,16 @@ class ForestClientFromGit:
 
     def forestClientIdExists(self, clientId):
         # remove any padding characters
-        clientIdPadded = self.getPaddedForestClientID(clientId)
+        clientIdPadded = self.fcUtil.getPaddedForestClientID(clientId)
         clientExists = False
         if clientIdPadded in self.forestClientData.values():
             clientExists = True
         return clientExists
+
+
+class ForestClientUtil:
+    def __init__(self):
+        pass
 
     def getPaddedForestClientID(self, clientId):
         """Forest clients are an 8 digit field that is stored as a string.
