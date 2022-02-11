@@ -1,0 +1,12 @@
+{
+    "remote.WSL.server.connectThroughLocalhost": true,
+    "editor.rulers": [
+        80,
+        120
+    ],
+    "python.testing.pytestArgs": [
+        "src"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}

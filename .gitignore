@@ -1,0 +1,10 @@
+demo_roles.txt
+junk.txt
+__pycache__
+
+moh-keycloak-cicd-example.zip
+moh-keycloak-cicd-example
+.env
+venv
+__pycache__
+.pytest_cache
