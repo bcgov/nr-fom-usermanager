@@ -1,3 +1,8 @@
+"""This is just some sample code that was used to explore interacting with
+the keycloak api.  Eventually throw away, but is useful to go back to when
+trying to figure out best way to integrate.
+"""
+
 import keycloak
 import src.constants as constants
 import keycloak_wrapper

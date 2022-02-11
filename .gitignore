@@ -8,3 +8,4 @@ moh-keycloak-cicd-example
 venv
 __pycache__
 .pytest_cache
+junk.json
