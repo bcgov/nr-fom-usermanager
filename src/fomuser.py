@@ -7,8 +7,9 @@ import logging
 import constants
 import requests
 import ForestClient
+import PyInquirer
+import pprint
 
-#
 LOGGER = logging.getLogger()
 
 class FomAddUser:
@@ -21,7 +22,6 @@ class FomAddUser:
         roleExists = self.kc.roleExists(fomClientId)
         if not roleExists:
             self.kc.createRole(fomClientId)
-
 
 class FomKeycloak:
 
@@ -106,9 +106,73 @@ class FomKeycloak:
             roleExists = True
         return roleExists
 
+class CLIArgparse:
+
+    def __init__()
+
+class CLIInquirer:
+    """https://medium.com/geekculture/build-interactive-cli-tools-in-python-47303c50d75
+
+    looks promising, but taking to long... circle back to easier way.
+    Leaving code here for future
+    """
+    def __init__(self):
+        self.getQuestionDefs()
+        #self.defineStyles()
+
+    def defineStyles(self):
+        styleDict1 = {
+            "separator": '#6C6C6C',
+            "questionmark": '#FF9D00 bold',
+            "selected": '#5F819D',
+            "pointer": '#FF9D00 bold',
+            "instruction": '',  # default
+            "answer": '#5F819D bold',
+            "question": '',        }
+        self.style1 = PyInquirer.style_from_dict(styleDict1)
+
+    def getQuestionDefs(self):
+        self.questions = [
+            {
+                'type': 'list',
+                'name': 'queryType',
+                'message': 'Query Type?',
+                'choices': [
+                    'forest client query',
+                    'key cloak user query'
+                ]
+            },
+            {
+                'type': "input",
+                "name": "forestClientSearch",
+                "message": "Enter the characters to search forest clients"
+            },
+            {
+                'type': 'list',
+                'name': 'queryType',
+                'message': 'Query Type?',
+                'choices':
+
+            },
+
+            ]
+
+    def cliInit(self):
+        queryType = PyInquirer.prompt(self.questions)
+        print(f"queryType: {queryType}")
+        if queryType['queryType'] == 'forest client query':
+            fcSearch = queryType.get('forestClientSearch')
+
+
+            print(f'fcSearch: {fcSearch}')
+
+        LOGGER.debug("answers")
+        pprint(answers)
 
 
 
 
 if __name__ == '__main__':
-    FomKeycloak()
+    # FomKeycloak()
+    cli = CLI()
+    cli.cliInit()
