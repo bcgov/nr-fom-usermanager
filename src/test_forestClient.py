@@ -17,10 +17,11 @@ class TestClass:
         values = forestClientParsed_fixture.getMatchingClient('arm')
         LOGGER.debug(f"values: {values}")
 
-    def test_getPaddedForestClientID(self, forestClient_fixture):
+    def test_getPaddedForestClientID(self, forestClientUtil_fixture):
+        fc = forestClientUtil_fixture
         sampleData = [['33', '00000033'], ['2234', '00002234']]
         for data in sampleData:
-            padded = forestClient_fixture.getPaddedForestClientID(data[0])
+            padded = fc.getPaddedForestClientID(data[0])
             assert padded == data[1]
 
     def test_forestClientIdExists(self, forestClientParsed_fixture):
@@ -47,4 +48,11 @@ def forestClient_fixture():
 def forestClientParsed_fixture(forestClient_fixture):
     forestClient_fixture.parse()
     return forestClient_fixture
+
+@pytest.fixture
+def forestClientUtil_fixture():
+    fcUtil = ForestClient.ForestClientUtil()
+    return fcUtil
+
+
 

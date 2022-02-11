@@ -59,3 +59,14 @@ keycloak-wrapper : https://pypi.org/project/keycloak-wrapper/
 keycloak api: https://www.keycloak.org/docs-api/5.0/rest-api/index.html
 
 Where roles were extracted from the app: https://raw.githubusercontent.com/bcgov/nr-fom-api/master/apps/api/src/migrations/main/1616015261635-forestClient.js
+
+
+# Adding roles to keycloak service account
+
+stolen from: https://stackoverflow.com/questions/66452108/keycloak-get-users-returns-403-forbidden
+
+1. select client
+1. make sure service account is enabled
+1. go to service account roles
+1. in client roles: select realm management
+1. find the permission required
