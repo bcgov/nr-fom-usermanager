@@ -28,7 +28,7 @@ class ForestClientFromGit:
         self.fcTable = constants.FOREST_CLIENT_IN_GIT
         self.forestClientData = None
         self.fcUtil = ForestClientUtil()
-        #self.parse()
+        self.parse()
 
     def parse(self):
         # pulling the data down from the git repo
@@ -59,7 +59,7 @@ class ForestClientFromGit:
         values = []
         for fc in self.forestClientData:
             if fc.lower().startswith(characters.lower()):
-                values.append(fc)
+                values.append([fc, self.forestClientData[fc]])
         return values
 
     def forestClientIdExists(self, clientId):

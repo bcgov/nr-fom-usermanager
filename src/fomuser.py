@@ -7,7 +7,7 @@ import logging
 import constants
 import requests
 import ForestClient
-import PyInquirer
+import argparse
 import pprint
 
 LOGGER = logging.getLogger()
@@ -43,7 +43,7 @@ class FomKeycloak:
     def createRole(self, forestClientNumber: int):
         pass
 
-    def userIDExists(self, userId):
+    def getMatchingUsers(self, userId):
         """ Keycloak contains a lot of information about users.  This method
         determines if a userid exists in keycloak.  The method will do its own
         search of all the users in keycloak.  (not efficient)
@@ -83,8 +83,21 @@ class FomKeycloak:
 
         # if userid.lower() in [ role['name'] for user in users]:
 
+        # search in username email attributes.idir_username
+        # return username / email
+        matchedUsers = []
+        for user in users:
+
+            if user['username'].lower().startswith(userId.lower()):
+                matchedUsers.append([user['username'], user['email']])
+            elif  ('email' in user ) and   user['email'].lower().startswith(userId.lower()):
+                matchedUsers.append([user['username'], user['email']])
+            elif (( 'attributes' in user ) and 'idir_username' in user['attributes']) and \
+                    user['attributes']['idir_username'][0].lower().startswith(userId.lower()):
+                matchedUsers.append([user['username'], user['email']])
+
         LOGGER.debug(f"users: {users}")
-        return users
+        return matchedUsers
 
 
     def roleExists(self, forestClientNumber: int):
@@ -106,68 +119,49 @@ class FomKeycloak:
             roleExists = True
         return roleExists
 
-class CLIArgparse:
+class CLI:
 
-    def __init__()
-
-class CLIInquirer:
-    """https://medium.com/geekculture/build-interactive-cli-tools-in-python-47303c50d75
-
-    looks promising, but taking to long... circle back to easier way.
-    Leaving code here for future
-    """
     def __init__(self):
-        self.getQuestionDefs()
-        #self.defineStyles()
+        self.defineParser()
 
-    def defineStyles(self):
-        styleDict1 = {
-            "separator": '#6C6C6C',
-            "questionmark": '#FF9D00 bold',
-            "selected": '#5F819D',
-            "pointer": '#FF9D00 bold',
-            "instruction": '',  # default
-            "answer": '#5F819D bold',
-            "question": '',        }
-        self.style1 = PyInquirer.style_from_dict(styleDict1)
+    def defineParser(self):
+        parser = argparse.ArgumentParser(description='Add / Query Fom user data.')
+        parser.add_argument('-qfc', '--query-forest-client', type=str,                             help='Define the starting characters for forest clients you want to view / retrieve forest client ids for')
+        parser.add_argument('-qu', '--query-users',
+                             help='Query for keycloak users that match the string')
+        # parser.add_argument('--add-user', nargs=2,
+        #                     help='sum the integers (default: find the max)')
 
-    def getQuestionDefs(self):
-        self.questions = [
-            {
-                'type': 'list',
-                'name': 'queryType',
-                'message': 'Query Type?',
-                'choices': [
-                    'forest client query',
-                    'key cloak user query'
-                ]
-            },
-            {
-                'type': "input",
-                "name": "forestClientSearch",
-                "message": "Enter the characters to search forest clients"
-            },
-            {
-                'type': 'list',
-                'name': 'queryType',
-                'message': 'Query Type?',
-                'choices':
+        #parser.print_help()
+        print(f'parser: {parser}')
 
-            },
+        args = parser.parse_args()
+        print(f'args: {args}')
 
-            ]
+        if args.query_forest_client:
+            # do search
+            print(f'search chars: {args.query_forest_client}')
+            self.queryForestClient(args.query_forest_client)
 
-    def cliInit(self):
-        queryType = PyInquirer.prompt(self.questions)
-        print(f"queryType: {queryType}")
-        if queryType['queryType'] == 'forest client query':
-            fcSearch = queryType.get('forestClientSearch')
+        elif args.query_users:
+            print(f'search chars: {args.query_users}')
+            self.queryUsers(args.query_users)
 
+    def queryForestClient(self, queryString):
+        fc = ForestClient.ForestClient()
+        matches = fc.getMatchingClient(queryString)
+        print(f"forest clients matching: {queryString}")
+        print("-"*80)
+        formattedList = [f"{match[0]:50} - {int(match[1]):8d}" for match in matches]
+        print('\n'.join(formattedList))
 
-            print(f'fcSearch: {fcSearch}')
-
-        LOGGER.debug("answers")
-        pprint(answers)
+    def queryUsers(self, queryString):
+        kc = FomKeycloak()
+        users = kc.getMatchingUsers(queryString)
+        formattedList = [f"{match[0]:30} - {match[1]:20}" for match in users]
+        print(f"matching users for search: {queryString}")
+        print("-"*80)
+        print('\n'.join(formattedList))
 
 
 
@@ -175,4 +169,3 @@ class CLIInquirer:
 if __name__ == '__main__':
     # FomKeycloak()
     cli = CLI()
-    cli.cliInit()
