@@ -24,6 +24,13 @@ class TestClass:
             padded = fc.getPaddedForestClientID(data[0])
             assert padded == data[1]
 
+    def test_getForestClientDescription(self, forestClientParsed_fixture):
+        client = 187347
+        desc = forestClientParsed_fixture.getForestClientDescription(client)
+        LOGGER.debug(f"desc: {desc}")
+        assert desc is not None
+        assert desc == 'LANDING HV DEVELOPMENT LTD'
+
     def test_forestClientIdExists(self, forestClientParsed_fixture):
         fc = forestClientParsed_fixture
         clientsThatExist = ['188736', '187347', '186040', '181461', '177380',

@@ -1,15 +1,19 @@
 import os
 import dotenv
 import sys
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 # populate the env vars from an .env file if it exists
 envPath = os.path.join(os.path.dirname(__file__), '..', '.env')
 if os.path.exists(envPath):
-    print("loading dot env...")
+    LOGGER.debug("loading dot env...")
     dotenv.load_dotenv()
 
 # env vars that should be populated for script to run
-ENV_VARS = ['KC_HOST', 'KC_CLIENTID', 'KC_REALM', 'KC_SECRET', 'FOREST_CLIENT_IN_GIT']
+ENV_VARS = ['KC_HOST', 'KC_CLIENTID', 'KC_REALM', 'KC_SECRET',
+            'FOREST_CLIENT_IN_GIT', 'KC_FOM_CLIENTID']
 module = sys.modules[__name__]
 
 
