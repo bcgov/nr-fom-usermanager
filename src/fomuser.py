@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 """command line based tool that attempts to make it easy to add new users
 to the fom application
 """
@@ -38,13 +40,21 @@ class CLI:
         parser.add_argument('-qfc', '--query-forest-client', type=str,                             help='Define the starting characters for forest clients you want to view / retrieve forest client ids for')
         parser.add_argument('-qu', '--query-users',
                              help='Query for keycloak users that match the string')
-        # parser.add_argument('--add-user', nargs=2,
-        #                     help='sum the integers (default: find the max)')
+        parser.add_argument('-a' '--add-user', nargs=2,
+                             help='Add User ')
 
-        #parser.print_help()
-        LOGGER.debug(f'parser: {parser}')
+        # TODO: Add a subparser here to better describe the two args for add-user
+
 
         args = parser.parse_args()
+
+        if not args.query_forest_client and \
+            not args.query_users and \
+                not args.query_users:
+                    parser.print_help()
+
+        LOGGER.debug(f'parser: {parser}')
+
         LOGGER.debug(f'args: {args}')
 
         if args.query_forest_client:
@@ -102,10 +112,11 @@ class CLI:
         # adding the user
         if not kc.roleExists(forestclient):
             description = self.fc.getForestClientDescription(forestclient)
+            # creating the role if it doesn't exist
             kc.createRole(forestclient, description)
+        # mapping role to user
+        kc.addRoleToUser(userid, forestclient)
 
-        # finally do the role mapping.
-        #if not
 
 
 

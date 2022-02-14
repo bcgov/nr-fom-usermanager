@@ -8,6 +8,7 @@ import constants
 import requests
 import re
 import logging
+import operator
 
 LOGGER = logging.getLogger(__name__)
 
@@ -75,8 +76,9 @@ class ForestClientFromGit:
     def getMatchingClient(self, characters):
         values = []
         for fc in self.forestClientData:
-            if fc.lower().startswith(characters.lower()):
+            if characters.lower() in fc.lower():
                 values.append([fc, self.forestClientData[fc]])
+        values = (sorted(values, key=operator.itemgetter(0)))
         return values
 
     def forestClientIdExists(self, clientId):
@@ -114,10 +116,6 @@ class ForestClientUtil:
         fcPadded = self.getPaddedForestClientID(clientID)
         roleName = f'{self.rolePrefix}{fcPadded}'
         return roleName
-
-
-
-
 
 if __name__ == '__main__':
     fc = ForestClientFromGit()
