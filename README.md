@@ -76,6 +76,12 @@ Projected syntax:
 fom-user <forest client id> <user email>
 ```
 
+# Building the package manually
+
+```
+pip install -r requirements-build.txt
+python -m build --sdist
+```
 
 # Related links / Information
 

@@ -7,8 +7,8 @@ This script cleans up those roles
 
 import logging
 
-import constants
-import FOMKeyCloak
+from . import constants
+from . import FOMKeyCloak
 
 LOGGER = logging.getLogger(__name__)
 

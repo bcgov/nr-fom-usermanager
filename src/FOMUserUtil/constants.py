@@ -8,7 +8,7 @@ LOGGER = logging.getLogger(__name__)
 envFile = '.env-dev'
 
 # populate the env vars from an .env file if it exists
-envPath = os.path.join(os.path.dirname(__file__), '..', envFile)
+envPath = os.path.join(os.path.dirname(__file__), '..', '..', envFile)
 LOGGER.debug(f"envPath: {envPath}")
 if os.path.exists(envPath):
     LOGGER.debug("loading dot env...")

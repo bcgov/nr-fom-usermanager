@@ -6,8 +6,8 @@ import keycloak_wrapper
 #       end points in KC is actually pretty easy.  Move to wrapping my self.
 import requests
 
-import constants
-import ForestClient
+from . import constants
+from . import ForestClient
 
 LOGGER = logging.getLogger(__name__)
 
@@ -15,17 +15,32 @@ LOGGER = logging.getLogger(__name__)
 class FomKeycloak:
 
     def __init__(self):
-        self.connect()
+        #self.connect()
+        self.getAccessToken()
         self.fcUtil = ForestClient.ForestClientUtil()
 
-    def connect(self):
-        self.token = keycloak_wrapper.access_token_sa(
-            constants.KC_HOST,
-            constants.KC_REALM,
-            constants.KC_CLIENTID,
-            constants.KC_SECRET)
-        self.access_token = self.token['access_token']
-        LOGGER.debug("success getting access token")
+    # def connect(self):
+    #     self.token = keycloak_wrapper.access_token_sa(
+    #         constants.KC_HOST,
+    #         constants.KC_REALM,
+    #         constants.KC_CLIENTID,
+    #         constants.KC_SECRET)
+    #     self.access_token = self.token['access_token']
+    #     LOGGER.debug("success getting access token")
+
+    def getAccessToken(self):
+        uri = f"{constants.KC_HOST}/auth/realms/{constants.KC_REALM}/protocol/openid-connect/token"
+        header = {'Accept': 'application/json'}
+        params = {
+                "client_id": constants.KC_CLIENTID,
+                "client_secret": constants.KC_SECRET,
+                "grant_type":"client_credentials"}
+        LOGGER.debug(f'uri: {uri}')
+        r = requests.post(uri, data=params, headers=header)
+        r.raise_for_status()
+        access_key = r.json()
+        self.access_token = access_key['access_token']
+        LOGGER.debug(f'response as json string {self.access_token}')
 
     def getMatchingUsers(self, userId):
         """ Keycloak contains a lot of information about users.  This method
