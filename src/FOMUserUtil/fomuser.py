@@ -6,8 +6,8 @@ import argparse
 import logging
 import sys
 
-import FOMKeyCloak
-import ForestClient
+from . import FOMKeyCloak
+from . import ForestClient
 
 LOGGER = logging.getLogger()
 

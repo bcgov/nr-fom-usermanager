@@ -10,7 +10,7 @@ import re
 
 import requests
 
-import constants
+from . import constants
 
 LOGGER = logging.getLogger(__name__)
 
@@ -122,17 +122,12 @@ class ForestClient(ForestClientFromGit):
     def __init__(self):
         ForestClientFromGit.__init__(self)
 
-    def getMatchingClient(self, searchCharacters):
-        return self.fc_git.getMatchingClient(searchCharacters)
+    # def getMatchingClient(self, searchCharacters):
+    #     return self.fc_git.getMatchingClient(searchCharacters)
 
-    def forestClientIdExists(self, clientId):
-        return self.fc_git.forestClientIdExists(clientId)
+    # def forestClientIdExists(self, clientId):
+    #     return self.fc_git.forestClientIdExists(clientId)
 
-    def getForestClientDescription(self, clientId):
-        """Returns the description for a matching forest client id"""
-        return self.fc_git.getForestClientDescription(clientId)
-
-
-if __name__ == '__main__':
-    fc = ForestClientFromGit()
-    fc.parseMultiple()
+    # def getForestClientDescription(self, clientId):
+    #     """Returns the description for a matching forest client id"""
+    #     return self.fc_git.getForestClientDescription(clientId)

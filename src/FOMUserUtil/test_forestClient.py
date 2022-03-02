@@ -1,6 +1,8 @@
-import pytest
-import ForestClient
 import logging
+
+import pytest
+
+from . import ForestClient
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.debug("message test")

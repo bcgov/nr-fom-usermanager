@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-import FOMKeyCloak
+from . import FOMKeyCloak
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.debug("message test")
