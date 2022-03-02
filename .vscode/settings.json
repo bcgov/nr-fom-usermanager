@@ -8,5 +8,27 @@
         "src"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "cSpell.words": [
+        "bceid",
+        "CLIENTID",
+        "dotenv",
+        "enterprisedir",
+        "fomuser",
+        "forestclientid",
+        "fromjson",
+        "hndlr",
+        "idir",
+        "keycloak",
+        "KLIK",
+        "KLIMA",
+        "KLISTERS",
+        "OIDC",
+        "Prometheusdir",
+        "rtype",
+        "userid",
+        "warf"
+    ],
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true
 }

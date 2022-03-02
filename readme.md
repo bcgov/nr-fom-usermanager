@@ -15,6 +15,10 @@ inefficient as it would require  looking up:
 This repository contains the code for a simple command line based tool. That
 will make it easy to add new users to the FOM application.
 
+# Setup
+
+
+
 # Running Script
 
 ## Search forest clients
@@ -28,7 +32,7 @@ Example:
 
 ```
 kirk@NCC1701:$ python fomuser.py -qfc kli
-forest clients matching: arm
+forest clients matching: kli
 --------------------------------------------------------------------------------
 KLINGON CONTRACTING LTD.                           -    18514
 KLINGON SAND & GRAVEL LTD.                         -    31775
@@ -40,7 +44,6 @@ KLIMA RESOURCES LTD.                               -   110974
 KLISTERS PELLET INC                                -   126239
 KLIK & CLOCK CONSULTING LTD.                       -   126967
 
-(venv) kjnether@NE080281:~/proj/keycloak-add-role/src$
 ```
 
 ## Search Keycloak users
@@ -65,12 +68,15 @@ sp.warf@bce-klingon-id                 - warf@birdofprey.ca
 Having determined the user id, and the forest client the new user can now be
 added:
 
-`formuser --add <userid> <forest client id>`
-
-
+`fomuser --add <userid> <forest client id>`
 
 
 Projected syntax:
 ```
 fom-user <forest client id> <user email>
 ```
+
+
+# Related links / Information
+
+https://github.com/bcgov/ocp-sso/issues/118

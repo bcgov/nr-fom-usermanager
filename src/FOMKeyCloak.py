@@ -1,11 +1,16 @@
+import logging
+
+import keycloak_wrapper
+# TODO: not happy with the way this wrapper is implemented... Should provide
+#       errors when api call fails, among other things.  Connecting to api
+#       end points in KC is actually pretty easy.  Move to wrapping my self.
+import requests
+
 import constants
 import ForestClient
-import keycloak_wrapper
-import logging
-import requests
-import json
 
 LOGGER = logging.getLogger(__name__)
+
 
 class FomKeycloak:
 
@@ -19,15 +24,15 @@ class FomKeycloak:
             constants.KC_REALM,
             constants.KC_CLIENTID,
             constants.KC_SECRET)
-        #print(f'self.token {self.token}')
         self.access_token = self.token['access_token']
+        LOGGER.debug("success getting access token")
 
     def getMatchingUsers(self, userId):
         """ Keycloak contains a lot of information about users.  This method
         determines if a userid exists in keycloak.  The method will do its own
         search of all the users in keycloak.  (not efficient)
 
-        Looks for either <userid>@<identitiy provider>, or looks for any user id
+        Looks for either <userid>@<identity provider>, or looks for any user id
         that matches the identity provider.
 
         If more than one user is found then a warning message will be logged.
@@ -46,7 +51,7 @@ class FomKeycloak:
         # /{realm}/users
         # params = {"realm-name": constants.KC_REALM}
         # headers = {"Authorization": "Bearer " + self.access_token}
-        # Url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/users"
+        # Url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/users" # noqa
         # LOGGER.debug(f"URL: {Url}")
         # response = requests.get(url=Url,
         #                         headers=headers)
@@ -66,10 +71,13 @@ class FomKeycloak:
 
             if user['username'].lower().startswith(userId.lower()):
                 matchedUsers.append([user['username'], user['email']])
-            elif  ('email' in user ) and   user['email'].lower().startswith(userId.lower()):
+            elif ('email' in user) and user['email'].lower().startswith(
+                    userId.lower()):
                 matchedUsers.append([user['username'], user['email']])
-            elif (( 'attributes' in user ) and 'idir_username' in user['attributes']) and \
-                    user['attributes']['idir_username'][0].lower().startswith(userId.lower()):
+            elif (('attributes' in user) and
+                  'idir_username' in user['attributes']) and \
+                    user['attributes']['idir_username'][0].lower().startswith(
+                        userId.lower()):
                 matchedUsers.append([user['username'], user['email']])
 
         LOGGER.debug(f"users: {users}")
@@ -100,18 +108,30 @@ class FomKeycloak:
             isValid = True
         return isValid
 
-    def getRoles(self, forestClientNumber: int):
-        roleName = self.fcUtil.getRoleName(forestClientNumber)
-
-        LOGGER.debug(f"self.access_token: {self.access_token}")
+    def getRoles(self, clientID):
+        """returns a list of roles that exist within the provided client id"""
         roles = keycloak_wrapper.client_roles(
             f"{constants.KC_HOST}/auth/",
             constants.KC_REALM,
             self.access_token,
-            'fom')
-        LOGGER.debug(f"{roles}")
-        roles = [ role for role in roles  if roleName == role['name'] ]
+            clientID)
         return roles
+
+    def getFOMRoles(self, forestClientNumber: int):
+        """_summary_
+
+        :param forestClientNumber: _description_
+        :type forestClientNumber: int
+        :param clientID: _description_, defaults to 'fom'
+        :type clientID: str, optional
+        :return: _description_
+        :rtype: _type_
+        """
+        roles = self.getRoles(constants.FOM_CLIENT_ID)
+        roleName = self.fcUtil.getRoleName(forestClientNumber)
+
+        filteredRoles = [role for role in roles if roleName == role['name']]
+        return filteredRoles
 
     def roleExists(self, forestClientNumber: int):
         """ Checks to see if the forest client exists in keycloak
@@ -121,9 +141,9 @@ class FomKeycloak:
         """
         roleName = self.fcUtil.getRoleName(forestClientNumber)
 
-        roles = self.getRoles(forestClientNumber)
+        roles = self.getFOMRoles(forestClientNumber)
         roleExists = False
-        if roleName in [  role['name'] for role in roles]:
+        if roleName in [role['name'] for role in roles]:
             roleExists = True
         return roleExists
 
@@ -135,7 +155,7 @@ class FomKeycloak:
         """
         clients = keycloak_wrapper.realm_clients(
             f"{constants.KC_HOST}/auth/", constants.KC_REALM,
-             self.access_token)
+            self.access_token)
         fomClient = None
         for client in clients:
             if client['clientId'] == constants.KC_FOM_CLIENTID:
@@ -146,31 +166,84 @@ class FomKeycloak:
         """Creates the role for the forest client id if it doesn't already
         exist.
 
-        * send payload/body where {"name":"rolenametocreate"}
+        * send payload/body where {"name":"role name to create"}
         * end point /auth/admin/realms/$REALM/clients/$CLIENTID/roles
         * method POST
         """
-        #self.fcUtil.
+        # self.fcUtil.
         if not self.roleExists(forestClientId):
             roleName = self.fcUtil.getRoleName(forestClientId)
             LOGGER.debug(f'rolename: {roleName}')
 
             clientid = self.getFomClientId()
-            Url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/clients/{clientid}/roles"
-            data = { "name" : roleName,
-                     "description":  description}
+            Url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/clients/{clientid}/roles"  # noqa
+            data = {"name": roleName,
+                    "description":  description}
             headers = {
                 "Authorization": "Bearer " + self.access_token,
-                'Content-type':'application/json',
-                'Accept':'application/json'}
+                'Content-type': 'application/json',
+                'Accept': 'application/json'}
             response = requests.post(url=Url,
                                      headers=headers,
                                      json=data)
-            LOGGER.debug(f"response: {response.status_code}")
+            response.raise_for_status()
+
+    def removeRole(self, clientID, roleName):
+        """_summary_
+
+        :param clientID: _description_
+        :type clientID: _type_
+        :param roleName: _description_
+        :type roleName: _type_
+
+        https://$KC_URL/auth/admin/realms/$REALM/clients/{id}/roles/{role-name}
+
+        """
+        LOGGER.debug(f'clientID: {clientID}')
+        LOGGER.debug(f'roleName: {roleName}')
+        Url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/clients/{clientID}/roles/{roleName}"  # noqa
+        headers = {
+            "Authorization": "Bearer " + self.access_token,
+            'Content-type': 'application/json',
+            'Accept': 'application/json'}
+        LOGGER.debug(f"deleting the role: {roleName}")
+        response = requests.delete(url=Url,
+                                   headers=headers
+                                   )
+        response.raise_for_status()
+        LOGGER.debug(f"response: {response.status_code}")
+
+    def getClients(self):
+        '''
+        GET /{realm}/clients
+        '''
+        Url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/clients"  # noqa
+        headers = {
+            "Authorization": "Bearer " + self.access_token,
+            'Content-type': 'application/json',
+            'Accept': 'application/json'}
+        response = requests.get(url=Url,
+                                headers=headers
+                                )
+        response.raise_for_status()
+        LOGGER.debug(f"response: {response.status_code}")
+
+        data = response.json()
+        return data
+
+    def getClient(self, clientID):
+        """gets a list of all the clients in the realm and returns only the
+        client that matches the clientID provided
+        """
+        clients = self.getClients()
+        client = None
+        for client in clients:
+            if client['clientId'].lower() == clientID.lower():
+                break
+        return client
 
     def addRoleToUser(self, userid, forestClientId):
         """This is the role mapping exercise...
-
 
         /auth/admin/realms/$REALM/users/$USERID/role-mappings/clients/$CLIENTID
         USERID - comes from user['id']
@@ -193,23 +266,19 @@ class FomKeycloak:
         # TODO: make sure only one user
         LOGGER.debug(f"users length {len(matchUsers)}")
 
-
-        roles = self.getRoles(forestClientId)
+        roles = self.getFOMRoles(forestClientId)
         LOGGER.debug(f"roles length {len(roles)}")
         LOGGER.debug(f"role length {roles}")
 
         clientid = self.getFomClientId()
 
-        Url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/users/{matchUsers[0]['id']}/role-mappings/clients/{clientid}"
+        Url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/users/{matchUsers[0]['id']}/role-mappings/clients/{clientid}"  # noqa
         headers = {
             "Authorization": "Bearer " + self.access_token,
-            'Content-type':'application/json',
-            'Accept':'application/json'}
+            'Content-type': 'application/json',
+            'Accept': 'application/json'}
 
         response = requests.post(url=Url,
-                                    headers=headers,
-                                    json=roles)
-
-
-
-
+                                 headers=headers,
+                                 json=roles)
+        response.raise_for_status()

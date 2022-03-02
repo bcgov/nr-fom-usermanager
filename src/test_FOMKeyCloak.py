@@ -1,12 +1,11 @@
-import pytest
-import ForestClient
 import logging
-import fomuser
+
+import pytest
+
 import FOMKeyCloak
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.debug("message test")
-
 
 
 class Test_FOMKeyCloak:
@@ -20,11 +19,13 @@ class Test_FOMKeyCloak:
 
     def test_getRoles(self, fomKeyCloak_fixture):
         roles = fomKeyCloak_fixture.getRoles('99999999')
-
+        # should error but doesn't
+        LOGGER.debug(f"roles: {roles}")
 
     def test_userIDExists(self, fomKeyCloak_fixture):
-        userData = fomKeyCloak_fixture.userIDExists('kjnether@idir')
+        userData = fomKeyCloak_fixture.isValidUser('kjnether@idir')
         LOGGER.debug(f"userData: {userData}")
+        assert userData is True
 
     def test_addRoleToUser(self, fomKeyCloak_fixture):
         fomKeyCloak_fixture.addRoleToUser('kjnether@idir', '99999999')
@@ -42,9 +43,9 @@ class Test_FOMKeyCloak:
     def test_isValidUser(self, fomKeyCloak_fixture):
         users = fomKeyCloak_fixture.getAllUsers()
         valid = fomKeyCloak_fixture.isValidUser(users[0]['username'])
-
         LOGGER.debug(f"isvalid: {valid}")
+
 
 @pytest.fixture
 def fomKeyCloak_fixture():
-    return  FOMKeyCloak.FomKeycloak()
+    return FOMKeyCloak.FomKeycloak()

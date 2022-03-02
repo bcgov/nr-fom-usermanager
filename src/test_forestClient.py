@@ -6,11 +6,13 @@ LOGGER = logging.getLogger(__name__)
 LOGGER.debug("message test")
 
 
-
-class TestClass:
+class Test_ForestClientFromGit:
 
     def test_forestClientFromGitParse(self, forestClient_fixture):
-        forestClient_fixture.parse()
+        forestClient_fixture.parseMultiple()
+        LOGGER.debug(
+            "number of forest clients: " +
+            f"{len(forestClient_fixture.forestClientData)}")
         assert len(forestClient_fixture.forestClientData) >= 22408
 
     def test_getMatchingClient(self, forestClientParsed_fixture):
@@ -49,12 +51,14 @@ class TestClass:
 
 @pytest.fixture
 def forestClient_fixture():
-    return  ForestClient.ForestClientFromGit()
+    return ForestClient.ForestClientFromGit()
+
 
 @pytest.fixture
 def forestClientParsed_fixture(forestClient_fixture):
-    forestClient_fixture.parse()
+    forestClient_fixture.parseMultiple()
     return forestClient_fixture
+
 
 @pytest.fixture
 def forestClientUtil_fixture():
@@ -62,4 +66,7 @@ def forestClientUtil_fixture():
     return fcUtil
 
 
-
+@pytest.fixture
+def forestClientCsv_fixture():
+    fcUtil = ForestClient.ForestClientFromCsv()
+    return fcUtil
