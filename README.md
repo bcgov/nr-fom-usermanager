@@ -1,3 +1,12 @@
+<!-- PROJECT SHIELDS -->
+
+[![Contributors](https://img.shields.io/github/contributors/bcgov/nr-fom-usermanager)](/../../graphs/contributors)
+[![Forks](https://img.shields.io/github/forks/bcgov/nr-fom-usermanager)](/../../network/members)
+[![Stargazers](https://img.shields.io/github/stars/bcgov/nr-fom-usermanager)](/../../stargazers)
+[![Issues](https://img.shields.io/github/issues/bcgov/nr-fom-usermanager)](/../../issues)
+[![MIT License](https://img.shields.io/github/license/bcgov/nr-fom-usermanager.svg)](/LICENSE.md)
+[![Lifecycle](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
+
 # Overview
 
 The [Forest Operations Map](https://github.com/bcgov/nr-fom-api) application
