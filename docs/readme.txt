@@ -12,24 +12,21 @@ curl -v \
 
 
 
-# WORKS! gets access token (JWT?)----------------------
-# --------------------------------
-curl -v \
+# WORKS! gets access token (JWT?)
+# and decodes it to json
+curl  \
   -H "Accept: application/json" \
   -d "client_id=$KC_CLIENTID" \
   -d "client_secret=$KC_SECRET" \
   -d "grant_type=client_credentials" \
-  "$KC_HOST/auth/realms/$KC_REALM/protocol/openid-connect/token"
-
-
+  "$KC_HOST/auth/realms/$KC_REALM/protocol/openid-connect/token" | \
+  jq ".access_token" | tr -d '"' | jq -R 'split(".") | .[0],.[1] | @base64d | fromjson'
 
 
 
 curl \
   -H "Authorization: bearer $KC_ACCESS_TOKEN" \
   "$KC_HOST/auth/admin/realms/$KC_REALM"
-
-
 
 
 # What did?
