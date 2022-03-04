@@ -9,14 +9,20 @@ envFile = '.env-dev'
 
 # populate the env vars from an .env file if it exists
 envPath = os.path.join(os.path.dirname(__file__), '..', '..', envFile)
+localEnvPath = os.path.join(os.getcwd(), '.env')
 LOGGER.debug(f"envPath: {envPath}")
 if os.path.exists(envPath):
-    LOGGER.debug("loading dot env...")
+    LOGGER.debug(f"loading dot env {envPath}...")
     dotenv.load_dotenv(envPath)
+
+elif os.path.exists(localEnvPath):
+    LOGGER.debug(f"loading dot env {localEnvPath}...")
+    dotenv.load_dotenv(localEnvPath)
 
 # env vars that should be populated for script to run
 ENV_VARS = ['KC_HOST', 'KC_CLIENTID', 'KC_REALM', 'KC_SECRET',
-            'KC_FOM_CLIENTID', 'KC_SA_CLIENTID']
+            'KC_FOM_CLIENTID']
+# KC_SA_CLIENTID
 
 module = sys.modules[__name__]
 

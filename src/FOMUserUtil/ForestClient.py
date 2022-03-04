@@ -9,8 +9,10 @@ import operator
 import re
 
 import requests
-
-from . import constants
+try:
+    from . import constants
+except ImportError:
+    import constants
 
 LOGGER = logging.getLogger(__name__)
 

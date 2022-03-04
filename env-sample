@@ -1,0 +1,5 @@
+KC_HOST=https://<host>
+KC_CLIENTID=<client id>
+KC_SECRET=<client secret>
+KC_REALM=<realm>
+KC_FOM_CLIENTID=<fom kc client>

@@ -6,8 +6,12 @@ import keycloak_wrapper
 #       end points in KC is actually pretty easy.  Move to wrapping my self.
 import requests
 
-from . import constants
-from . import ForestClient
+try:
+    from . import constants
+    from . import ForestClient
+except ImportError:
+    import constants
+    import ForestClient
 
 LOGGER = logging.getLogger(__name__)
 
@@ -85,7 +89,10 @@ class FomKeycloak:
         for user in users:
 
             if user['username'].lower().startswith(userId.lower()):
-                matchedUsers.append([user['username'], user['email']])
+                email = ''
+                if email in user:
+                    email = user['email']
+                matchedUsers.append([user['username'], email])
             elif ('email' in user) and user['email'].lower().startswith(
                     userId.lower()):
                 matchedUsers.append([user['username'], user['email']])
