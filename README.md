@@ -26,21 +26,42 @@ will make it easy to add new users to the FOM application.
 
 # Setup
 
+## define the following env vars
 
+Either copy this file as .env: [https://raw.githubusercontent.com/bcgov/nr-fom-usermanager/main/env-sample]
 
-# Running Script
+or populate these env vars
+
+```
+KC_HOST=https://<host>
+KC_CLIENTID=<The kc client set up to administer fom users>
+KC_SECRET=<client secret>
+KC_REALM=<realm>
+KC_FOM_CLIENTID=<the kc client that fom app uses to authenticate against>
+```
+
+## Install
+
+```
+python3 -m venv venvfom
+source ./venvfom/bin/activate
+pip install FOMUserUtil
+```
+
+# Using the CLI tool
 
 ## Search forest clients
 
 Before a new user can be added we need to know what forest client id to attach
 them to.  This is accomplished with a forest client search.
 
-`python fomuser.py -qfc <search string>`
+
+`fomuser -qfc <search string>`
 
 Example:
 
 ```
-kirk@NCC1701:$ python fomuser.py -qfc kli
+kirk@NCC1701:$ fomuser -qfc kli
 forest clients matching: kli
 --------------------------------------------------------------------------------
 KLINGON CONTRACTING LTD.                           -    18514
@@ -59,12 +80,12 @@ KLIK & CLOCK CONSULTING LTD.                       -   126967
 Having determined what the forest client id is, use the following command to
 search for the users in keycloak:
 
-`fomuser.py -qu <search string>`
+`fomuser -qu <search string>`
 
 Example:
 
 ```
-kirk@NCC1701:$ python fomuser.py -qu sp
+kirk@NCC1701:$ fomuser -qu sp
 matching users for search: kj
 --------------------------------------------------------------------------------
 spock@enterprisedir                    - spock.mock@gov.bc.ca
@@ -95,3 +116,31 @@ python -m build --sdist
 # Related links / Information
 
 https://github.com/bcgov/ocp-sso/issues/118
+
+
+# Keycloak Config
+
+Assuming a fom client config already exists, the following instructions
+outline what needs to be done to add fom admin service account / client
+to keycloak.  At the moment this is accomplished using the GUI.
+
+* Create client
+  * protocol = openid-connect
+  * root url = blank
+
+* Configure Client - (screen that comes up after client is created)
+  * fill in <name> and <description>
+  * Access Type: confidential
+  * Service Accounts Enabled: On
+  * valid redirect uris: localhost
+
+* Configure roles: <Service Account Roles>
+  * type 'realm-management' in Client Roles and select
+  * Assign the following roles:
+    * manage-clients
+    * manage-users
+    * query-clients
+    * view-clients
+    * view-users
+
+

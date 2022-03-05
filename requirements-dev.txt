@@ -2,3 +2,5 @@ pytest==7.0.0
 black==22.1.0
 flake8==4.0.1
 autopep8==1.6.0
+xenon==0.9.0
+radon==5.1.0

@@ -9,8 +9,10 @@ import operator
 import re
 
 import requests
-
-from . import constants
+try:
+    from . import constants
+except ImportError:
+    import constants
 
 LOGGER = logging.getLogger(__name__)
 
@@ -27,6 +29,7 @@ class ForestClientFromGit:
         files2Parse = constants.FOREST_CLIENT_IN_GIT.split("||")
         LOGGER.debug(f"files2Parse:{files2Parse}")
         for file2Parse in files2Parse:
+            LOGGER.debug(f"parsing the file: {file2Parse}")
             self.parse(file2Parse)
 
     def parse(self, file2Parse):
@@ -51,6 +54,7 @@ class ForestClientFromGit:
         dataLine_regex = re.compile(
             "^\s+\('[0-9]{4,8}'\,\s+'.+'\,\s+CURRENT_USER\)\,\s*$")  # noqa
         LOGGER.debug(f"jsFCFile {type(jsFCFile)}")
+        cnt = 0
         for line in jsFCFile.split('\n'):
             if dataLine_regex.match(line):
                 line = line.replace(', CURRENT_USER),', '')
@@ -60,6 +64,9 @@ class ForestClientFromGit:
                 forestClientId = self.fcUtil.getPaddedForestClientID(
                     lineList[0])
                 self.forestClientData[lineList[1]] = forestClientId
+                if not cnt % 1000:
+                    LOGGER.debug(f"read and matched: {cnt}")
+                cnt += 1
         LOGGER.debug(f"number forest clients = {len(self.forestClientData)}")
 
     def getForestClientDescription(self, clientId):

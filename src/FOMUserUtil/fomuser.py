@@ -6,8 +6,12 @@ import argparse
 import logging
 import sys
 
-from . import FOMKeyCloak
-from . import ForestClient
+try:
+    from . import FOMKeyCloak
+    from . import ForestClient
+except ImportError:
+    import FOMKeyCloak
+    import ForestClient
 
 LOGGER = logging.getLogger()
 
@@ -88,7 +92,7 @@ class CLI:
     def queryUsers(self, queryString):
         kc = FOMKeyCloak.FomKeycloak()
         users = kc.getMatchingUsers(queryString)
-        formattedList = [f"{match[0]:30} - {match[1]:20}" for match in users]
+        formattedList = [f"{match[0]:35} - {match[1]:20}" for match in users]
         print(f"matching users for search: {queryString}")
         print("-"*80)
         print('\n'.join(formattedList))
@@ -131,14 +135,6 @@ class CLI:
 
 if __name__ == '__main__':
 
-    # debugging logging
-    # LOGGER = logging.getLogger()
-    # LOGGER.setLevel(logging.DEBUG)
-    # hndlr = logging.StreamHandler()
-    # formatter = logging.Formatter(
-    # '%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(message)s')
-    # hndlr.setFormatter(formatter)
-    # LOGGER.addHandler(hndlr)
 
     cli = CLI()
     cli.defineParser()

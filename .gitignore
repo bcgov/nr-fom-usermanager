@@ -14,3 +14,4 @@ data/V_CLIENT_PUBLIC.xls
 jwt.json
 dist
 src/FOMUserUtil.egg-info
+src/junk.py

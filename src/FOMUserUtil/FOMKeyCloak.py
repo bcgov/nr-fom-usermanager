@@ -6,8 +6,12 @@ import keycloak_wrapper
 #       end points in KC is actually pretty easy.  Move to wrapping my self.
 import requests
 
-from . import constants
-from . import ForestClient
+try:
+    from . import constants
+    from . import ForestClient
+except ImportError:
+    import constants
+    import ForestClient
 
 LOGGER = logging.getLogger(__name__)
 
@@ -83,16 +87,23 @@ class FomKeycloak:
         # return username / email
         matchedUsers = []
         for user in users:
+            # search for username
+            #if user['username'].lower().startswith(userId.lower()):
+            if userId.lower() in user['username'].lower():
+                email = ''
+                if 'email' in user:
+                    email = user['email']
+                matchedUsers.append([user['username'], email])
+            # search matching email
+            #elif ('email' in user) and user['email'].lower().startswith(
+            #        userId.lower()):
+            elif ('email' in user) and userId.lower() in user['email'].lower():
 
-            if user['username'].lower().startswith(userId.lower()):
-                matchedUsers.append([user['username'], user['email']])
-            elif ('email' in user) and user['email'].lower().startswith(
-                    userId.lower()):
                 matchedUsers.append([user['username'], user['email']])
             elif (('attributes' in user) and
                   'idir_username' in user['attributes']) and \
-                    user['attributes']['idir_username'][0].lower().startswith(
-                        userId.lower()):
+                    userId.lower() in user['attributes']['idir_username'][0].lower():
+
                 matchedUsers.append([user['username'], user['email']])
 
         LOGGER.debug(f"users: {users}")
