@@ -8,8 +8,7 @@ LOGGER = logging.getLogger(__name__)
 #envFiles = ['.env-prd', '.env-tst', '.env-dev']
 
 
-#envFile = '.env-dev'
-envFile = '.env-prd'
+envFile = '.env-dev'
 
 
 # populate the env vars from an .env file if it exists
