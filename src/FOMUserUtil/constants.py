@@ -5,7 +5,12 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
-envFile = '.env-dev'
+#envFiles = ['.env-prd', '.env-tst', '.env-dev']
+
+
+#envFile = '.env-dev'
+envFile = '.env-prd'
+
 
 # populate the env vars from an .env file if it exists
 envPath = os.path.join(os.path.dirname(__file__), '..', '..', envFile)
