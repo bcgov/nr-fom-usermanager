@@ -107,3 +107,31 @@ python -m build --sdist
 # Related links / Information
 
 https://github.com/bcgov/ocp-sso/issues/118
+
+
+# Keycloak Config
+
+Assuming a fom client config already exists, the following instructions
+outline what needs to be done to add fom admin service account / client
+to keycloak.  At the moment this is accomplished using the GUI.
+
+* Create client
+  * protocol = openid-connect
+  * root url = blank
+
+* Configure Client - (screen that comes up after client is created)
+  * fill in <name> and <description>
+  * Access Type: confidential
+  * Service Accounts Enabled: On
+  * valid redirect uris: localhost
+
+* Configure roles: <Service Account Roles>
+  * type 'realm-management' in Client Roles and select
+  * Assign the following roles:
+    * manage-clients
+    * manage-users
+    * query-clients
+    * view-clients
+    * view-users
+
+

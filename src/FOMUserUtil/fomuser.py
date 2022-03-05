@@ -135,14 +135,6 @@ class CLI:
 
 if __name__ == '__main__':
 
-    # debugging logging
-    # LOGGER = logging.getLogger()
-    # LOGGER.setLevel(logging.DEBUG)
-    # hndlr = logging.StreamHandler()
-    # formatter = logging.Formatter(
-    # '%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(message)s')
-    # hndlr.setFormatter(formatter)
-    # LOGGER.addHandler(hndlr)
 
     cli = CLI()
     cli.defineParser()

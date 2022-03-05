@@ -42,6 +42,6 @@ if envsNotSet:
 # default values for the references to the forest clients in the fom repo
 FOREST_CLIENT_IN_GIT = \
     'https://raw.githubusercontent.com/bcgov/nr-fom-api/master/apps/api/src/migrations/main/1616015261635-forestClient.js' + '||' + \
-    'https://github.com/bcgov/nr-fom-api/blob/master/apps/api/src/migrations/main/1639180924469-forestClientTypesNonCNonI.js' # noqa
+    'https://raw.githubusercontent.com/bcgov/nr-fom-api/master/apps/api/src/migrations/main/1639180924469-forestClientTypesNonCNonI.js' # noqa
 
 FOM_CLIENT_ID = 'fom'
