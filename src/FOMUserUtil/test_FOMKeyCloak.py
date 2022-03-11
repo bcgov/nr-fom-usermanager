@@ -43,7 +43,17 @@ class Test_FOMKeyCloak:
     def test_isValidUser(self, fomKeyCloak_fixture):
         users = fomKeyCloak_fixture.getAllUsers()
         valid = fomKeyCloak_fixture.isValidUser(users[0]['username'])
+        LOGGER.debug(f"users total: {len(users)}")
         LOGGER.debug(f"isvalid: {valid}")
+
+    def test_getAllUsers(self, fomKeyCloak_fixture):
+        users = fomKeyCloak_fixture.getAllUsers()
+        assert users is not None
+
+    def test_getUserCount(self, fomKeyCloak_fixture):
+        usersCnt = fomKeyCloak_fixture.getUserCount()
+        LOGGER.debug(f"total users in sys: {usersCnt}")
+
 
 
 @pytest.fixture
