@@ -15,3 +15,4 @@ jwt.json
 dist
 src/FOMUserUtil.egg-info
 src/junk.py
+src/FOMUserXlSync/msal_tokenCache.bin

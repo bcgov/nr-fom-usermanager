@@ -19,26 +19,17 @@ LOGGER = logging.getLogger(__name__)
 class FomKeycloak:
 
     def __init__(self):
-        #self.connect()
         self.getAccessToken()
         self.fcUtil = ForestClient.ForestClientUtil()
 
-    # def connect(self):
-    #     self.token = keycloak_wrapper.access_token_sa(
-    #         constants.KC_HOST,
-    #         constants.KC_REALM,
-    #         constants.KC_CLIENTID,
-    #         constants.KC_SECRET)
-    #     self.access_token = self.token['access_token']
-    #     LOGGER.debug("success getting access token")
-
     def getAccessToken(self):
-        uri = f"{constants.KC_HOST}/auth/realms/{constants.KC_REALM}/protocol/openid-connect/token"
+        uri = f"{constants.KC_HOST}/auth/realms/{constants.KC_REALM}" + \
+              "/protocol/openid-connect/token"
         header = {'Accept': 'application/json'}
         params = {
                 "client_id": constants.KC_CLIENTID,
                 "client_secret": constants.KC_SECRET,
-                "grant_type":"client_credentials"}
+                "grant_type": "client_credentials"}
         LOGGER.debug(f'uri: {uri}')
         r = requests.post(uri, data=params, headers=header)
         r.raise_for_status()
@@ -67,54 +58,76 @@ class FomKeycloak:
         :return: [description]
         :rtype: [type]
         """
-        # /{realm}/users
-        # params = {"realm-name": constants.KC_REALM}
-        # headers = {"Authorization": "Bearer " + self.access_token}
-        # Url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/users" # noqa
-        # LOGGER.debug(f"URL: {Url}")
-        # response = requests.get(url=Url,
-        #                         headers=headers)
-
-        # LOGGER.debug(f"response: {response}")
-        # LOGGER.debug(f"status: {response.status_code}")
-        # LOGGER.debug(f"status: {response.json()}")
-
         users = self.getAllUsers()
-
-        # if userid.lower() in [ role['name'] for user in users]:
-
-        # search in username email attributes.idir_username
-        # return username / email
         matchedUsers = []
         for user in users:
-            # search for username
-            #if user['username'].lower().startswith(userId.lower()):
             if userId.lower() in user['username'].lower():
                 email = ''
                 if 'email' in user:
                     email = user['email']
                 matchedUsers.append([user['username'], email])
-            # search matching email
-            #elif ('email' in user) and user['email'].lower().startswith(
-            #        userId.lower()):
             elif ('email' in user) and userId.lower() in user['email'].lower():
 
                 matchedUsers.append([user['username'], user['email']])
             elif (('attributes' in user) and
                   'idir_username' in user['attributes']) and \
-                    userId.lower() in user['attributes']['idir_username'][0].lower():
+                    userId.lower() in \
+                    user['attributes']['idir_username'][0].lower():
 
                 matchedUsers.append([user['username'], user['email']])
 
         LOGGER.debug(f"users: {users}")
         return matchedUsers
 
+    def getUserCount(self):
+        """ returns the number of users that are currently configured in
+        keycloak
+
+        :return: the number of users in keycloak
+        :rtype: int
+        """
+        url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/users/count"  # noqa
+        headers = {"Authorization": "Bearer " + self.access_token}
+        params = {"realm-name": constants.KC_HOST}
+        response = requests.get(url=url, params=params, headers=headers)
+        data = response.json()
+        return data
+
     def getAllUsers(self):
-        users = keycloak_wrapper.realm_users(
-            f"{constants.KC_HOST}/auth/",
-            constants.KC_REALM,
-            self.access_token)
-        return users
+        """ Returns all the users currently configured in Keycloak
+
+        :return: a list of objects from json describing all the users in
+                 keycloak
+        :rtype: list(dict)
+        """
+
+        # TODO: this is quick and dirty, could consider implementing a search
+        #      in the api call for a specific user instead of returning all the
+        #      users and then parsing that list
+        url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/users"  # noqa
+        headers = {"Authorization": "Bearer " + self.access_token}
+
+        userCnt = self.getUserCount()
+        LOGGER.debug(f"userCnt: {userCnt}")
+
+        max = 100
+        first = 0
+
+        userData = []
+
+        while len(userData) < userCnt:
+
+            params = {"realm-name": constants.KC_HOST, 'max': max,
+                      'first': first}
+            response = requests.get(url=url, params=params, headers=headers)
+            respData = response.json()
+            userData.extend(respData)
+            LOGGER.debug(f"first: {first}, userdata cnt: {len(userData)} " +
+                         f"usercount: {userCnt}")
+            first = first + max
+
+        LOGGER.debug(f"users returned: {len(userData)}")
+        return userData
 
     def isValidUser(self, userid):
         """validates that the user provided exists in keycloak, and that the
