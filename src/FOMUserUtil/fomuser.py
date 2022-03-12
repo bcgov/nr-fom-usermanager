@@ -28,8 +28,8 @@ class CLI:
                       Query for users:
                       %(prog)s -qu bill
 
-                      Add User:
-                      %(prog)s -a 1011 -u bill.the.cat"""
+                      Add User "bill.the.cat" to the role for forest client 1011:
+                      %(prog)s -a bill.the.cat 1011"""
 
         parser = argparse.ArgumentParser(
             description='Add / Query Fom user data.',
@@ -43,8 +43,12 @@ class CLI:
             '-qu', '--query-users',
             help='Query for keycloak users that match the string')
         parser.add_argument(
+            '-qur', '--query-users-role',
+            help='Query for keycloak users and roles they belong to (take ' +
+                 'a little longer)')
+        parser.add_argument(
             '-a', '--add-user',
-            metavar=('user-to-add', 'forest-client-id'),
+            metavar=('forest-client-id', 'user-to-add'),
             nargs=2,
             help='user is the username in k/c,  forest client id is just' +
                  ' the number')
@@ -56,7 +60,7 @@ class CLI:
 
         if not args.query_forest_client and \
             not args.query_users and \
-                not args.add_user:
+                not args.add_user and not args.query_users_role:
             parser.print_help()
             sys.exit()
 
@@ -70,15 +74,18 @@ class CLI:
             self.queryForestClient(args.query_forest_client)
 
         elif args.query_users:
-            LOGGER.debug(f'search chars: {args.query_users}')
+            LOGGER.debug(f'user search chars: {args.query_users}')
             self.queryUsers(args.query_users)
-
+        elif args.query_users_role:
+            LOGGER.debug(f'user / role search chars: {args.query_users_role}')
+            self.queryUsersAndRoles(args.query_users_role)
         else:
             # Adding user, user = 0 fc = 1
             LOGGER.debug(f"adduser arg: {args.add_user}")
             LOGGER.debug(f"adding the user: {args.add_user[0]} to the role " +
                          f"mapping for {args.add_user[1]}")
             self.addUser(args.add_user[0], args.add_user[1])
+            print('added user ')
 
     def queryForestClient(self, queryString):
         fc = ForestClient.ForestClient()
@@ -96,6 +103,40 @@ class CLI:
         print(f"matching users for search: {queryString}")
         print("-"*80)
         print('\n'.join(formattedList))
+
+    def queryUsersAndRoles(self, queryString):
+        print('getting users.. ', end='', flush=True)
+        kc = FOMKeyCloak.FomKeycloak()
+        #users = kc.getMatchingUsers(queryString)
+        LOGGER.debug(f"queryString: {queryString}")
+        users = kc.getMatchingUsersWithRoleMapping(queryString)
+        LOGGER.debug(f'users with Roles: {users}')
+        skipFirst = True
+        formatStrList = []
+        for user in users:
+            LOGGER.debug(f"user: {user}")
+            # does the user have any roles?
+            if user[2]:
+                fstr = f"{user[0]:35} - {user[1]:35} - {user[2][0]:20}"
+                formatStrList.append(fstr)
+                # is there more than one role associated with the role
+                if len(user[2]) > 1:
+                    for role in user[2]:
+                        if skipFirst:
+                            skipFirst = False
+                        else:
+                            formatStr = " " * 76 + role
+                            formatStrList.append(formatStr)
+            # user with no roles
+            else:
+                fstr = f"{user[0]:35} - {user[1]:35} - "
+                formatStrList.append(fstr)
+
+        #formattedList = [f"{match[0]:35} - {match[1]:20} - {match[2][0]:20}" for match in users]
+
+        print(f"\nmatching users for search: {queryString}")
+        print("-"*80)
+        print('\n'.join(formatStrList))
 
     def addUser(self, userid, forestclient):
         """receives a key cloak user id, verifies that it exists and that it
@@ -131,10 +172,8 @@ class CLI:
             kc.createRole(forestclient, description)
         # mapping role to user
         kc.addRoleToUser(userid, forestclient)
-
+        print("user: {userid} successfully added to role: {forestclient}")
 
 if __name__ == '__main__':
-
-
     cli = CLI()
     cli.defineParser()
