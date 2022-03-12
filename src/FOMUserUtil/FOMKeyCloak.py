@@ -20,9 +20,13 @@ class FomKeycloak:
 
     def __init__(self):
         self.getAccessToken()
+        self.defaultheaders = {"Authorization": "Bearer " + self.access_token}
+
         self.fcUtil = ForestClient.ForestClientUtil()
 
     def getAccessToken(self):
+        """using client id and secret queries keycloak for access token
+        """
         uri = f"{constants.KC_HOST}/auth/realms/{constants.KC_REALM}" + \
               "/protocol/openid-connect/token"
         header = {'Accept': 'application/json'}
@@ -37,7 +41,7 @@ class FomKeycloak:
         self.access_token = access_key['access_token']
         LOGGER.debug(f'response as json string {self.access_token}')
 
-    def getMatchingUsers(self, userId):
+    def getMatchingUsers(self, userId, usrAndEmailOnly=True):
         """ Keycloak contains a lot of information about users.  This method
         determines if a userid exists in keycloak.  The method will do its own
         search of all the users in keycloak.  (not efficient)
@@ -60,24 +64,103 @@ class FomKeycloak:
         """
         users = self.getAllUsers()
         matchedUsers = []
+        LOGGER.debug(f"userId: {userId}")
         for user in users:
             if userId.lower() in user['username'].lower():
-                email = ''
-                if 'email' in user:
-                    email = user['email']
-                matchedUsers.append([user['username'], email])
+                matchedUsers.append(user)
             elif ('email' in user) and userId.lower() in user['email'].lower():
+                matchedUsers.append(user)
 
-                matchedUsers.append([user['username'], user['email']])
             elif (('attributes' in user) and
                   'idir_username' in user['attributes']) and \
                     userId.lower() in \
                     user['attributes']['idir_username'][0].lower():
-
-                matchedUsers.append([user['username'], user['email']])
-
-        LOGGER.debug(f"users: {users}")
+                matchedUsers.append(user)
+        if usrAndEmailOnly:
+            matchedUsers = self.extractUsernameEmailFromuUserList(matchedUsers)
+        LOGGER.debug(f"matchedUsers: {matchedUsers}")
         return matchedUsers
+
+    def getMatchingUsersWithRoleMapping(self, userId):
+        """For a given string searches all the users and related roles and
+        returns a data structure like:
+        [ <username>, <email>, [<roles>...]]
+
+        :param userId: the input userid
+        :type userId: str
+        :return: list of users and the roles they belong to
+        :rtype: list
+        """
+        users = self.getMatchingUsers(userId, usrAndEmailOnly=False)
+        roleMappings = []
+        usrCnt = 0
+        print("", end='\x1b[1K\r', flush=True)
+        for user in users:
+            print(f'user {usrCnt} of {len(users)}', end='\r', flush=True)
+            #print('.', end='', flush=True) # noqa
+            roleMapping = self.getFOMUserRoleMappings(user['id'])
+            usernameAndEmail = self.extractUsernameEmailFromuUser(user)
+            usernameAndEmail.append(roleMapping)
+            LOGGER.debug(f'rolemaps: {roleMapping}')
+            roleMappings.append(usernameAndEmail)
+            usrCnt += 1
+
+        return roleMappings
+
+    def extractUsernameEmailFromuUserList(self, users):
+        userNameAndEmailList = []
+        for user in users:
+            userNameAndEmail = self.extractUsernameEmailFromuUser(user)
+            userNameAndEmailList.append(userNameAndEmail)
+        return userNameAndEmailList
+
+    def extractUsernameEmailFromuUser(self, user):
+        if 'email' in user:
+            email = user['email']
+            retVal = [user['username'], email]
+        elif (('attributes' in user) and
+                'idir_username' in user['attributes']):
+            retVal = [user['username'], user['email']]
+        return retVal
+
+    def getUserProfile(self, userId):
+        # GET /{realm}/users/{id}
+
+        url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/users/{userId}"  # noqa
+        params = {"realm-name": constants.KC_HOST}
+        response = requests.get(url=url, params=params,
+                                headers=self.defaultheaders)
+        data = response.json()
+        return data
+
+    def getFOMUserRoleMappings(self, userId, nameonly=True):
+        """for a given userId returns the rolemappings for that user id.  This
+        is the userid from keycloak, not the username.
+
+        :param userId: input userid
+        :type userId: str
+        :param nameonly: if set to true returns a list of only role names,
+                         defaults to True
+        :type nameonly: bool, optional
+        :return: list of role mapping for the given userid
+        :rtype: list
+        """
+        fomClient = self.getFomClientId()
+        LOGGER.debug(f"fomClient: {fomClient}")
+        url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/users/{userId}/role-mappings/clients/{fomClient}"  # noqa
+        LOGGER.debug(f"url: {url}")
+
+        params = {"realm-name": constants.KC_HOST}
+        LOGGER.debug(f"params: {params}")
+        response = requests.get(url=url, params=params,
+                                headers=self.defaultheaders)
+        data = response.json()
+        returnData = data
+        if nameonly:
+            returnData = []
+            for mapping in data:
+                returnData.append(mapping['name'])
+        return returnData
 
     def getUserCount(self):
         """ returns the number of users that are currently configured in
@@ -105,7 +188,6 @@ class FomKeycloak:
         #      in the api call for a specific user instead of returning all the
         #      users and then parsing that list
         url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/users"  # noqa
-        headers = {"Authorization": "Bearer " + self.access_token}
 
         userCnt = self.getUserCount()
         LOGGER.debug(f"userCnt: {userCnt}")
@@ -119,7 +201,8 @@ class FomKeycloak:
 
             params = {"realm-name": constants.KC_HOST, 'max': max,
                       'first': first}
-            response = requests.get(url=url, params=params, headers=headers)
+            response = requests.get(url=url, params=params,
+                                    headers=self.defaultheaders)
             respData = response.json()
             userData.extend(respData)
             LOGGER.debug(f"first: {first}, userdata cnt: {len(userData)} " +

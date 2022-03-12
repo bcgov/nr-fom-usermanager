@@ -27,6 +27,26 @@ class Test_FOMKeyCloak:
         LOGGER.debug(f"userData: {userData}")
         assert userData is True
 
+    def test_getMatchingUsers(self, fomKeyCloak_fixture):
+        users = fomKeyCloak_fixture.getMatchingUsers('kjn', False)
+        LOGGER.debug(f"userData: {users[0]}")
+
+    def test_getUserProfile(self, fomKeyCloak_fixture):
+        #users = fomKeyCloak_fixture.getMatchingUsers('huhs', False)
+        #LOGGER.debug(f"userData: {users}")
+        id = 'f5956310-cfab-4bf5-86f1-ba2bf47a576f'
+        profile = fomKeyCloak_fixture.getUserProfile(id)
+        LOGGER.debug(f"profile: {profile}")
+
+    def test_getFOMUserRoleMappings(self, fomKeyCloak_fixture):
+        id = 'f5956310-cfab-4bf5-86f1-ba2bf47a576f'
+        mappings = fomKeyCloak_fixture.getFOMUserRoleMappings(id)
+        LOGGER.debug(f"profile: {mappings}")
+
+    def test_getMatchingUsersWithRoleMapping(self, fomKeyCloak_fixture):
+        retVal = fomKeyCloak_fixture.getMatchingUsersWithRoleMapping('huh')
+        LOGGER.debug(f"userroles: {retVal}")
+
     def test_addRoleToUser(self, fomKeyCloak_fixture):
         fomKeyCloak_fixture.addRoleToUser('kjnether@idir', '99999999')
 
@@ -48,6 +68,7 @@ class Test_FOMKeyCloak:
 
     def test_getAllUsers(self, fomKeyCloak_fixture):
         users = fomKeyCloak_fixture.getAllUsers()
+        LOGGER.debug(f"first user: {users[0]}")
         assert users is not None
 
     def test_getUserCount(self, fomKeyCloak_fixture):
