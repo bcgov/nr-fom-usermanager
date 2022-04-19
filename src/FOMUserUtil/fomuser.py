@@ -172,7 +172,7 @@ class CLI:
             kc.createRole(forestclient, description)
         # mapping role to user
         kc.addRoleToUser(userid, forestclient)
-        print("user: {userid} successfully added to role: {forestclient}")
+        print(f"user: {userid} successfully added to role: {forestclient}")
 
 if __name__ == '__main__':
     cli = CLI()
