@@ -92,9 +92,10 @@ class FomKeycloak:
         :rtype: list
         """
         users = self.getMatchingUsers(userId, usrAndEmailOnly=False)
+        LOGGER.debug(f"users: {users}")
         roleMappings = []
         usrCnt = 0
-        print("", end='\x1b[1K\r', flush=True)
+        #print("", end='\x1b[1K\r', flush=True)
         for user in users:
             print(f'user {usrCnt} of {len(users)}', end='\r', flush=True)
             #print('.', end='', flush=True) # noqa
@@ -115,12 +116,30 @@ class FomKeycloak:
         return userNameAndEmailList
 
     def extractUsernameEmailFromuUser(self, user):
+        LOGGER.debug(f"extract email from user : {user}")
+        email = ''
+        username = ''
         if 'email' in user:
             email = user['email']
-            retVal = [user['username'], email]
-        elif (('attributes' in user) and
-                'idir_username' in user['attributes']):
-            retVal = [user['username'], user['email']]
+
+        # if the user is an idir user the user object will have the following
+        # properties:
+        #     attributes:
+        #         idir_user_guild list(str)
+        #         idir_userid list(str)
+        #         idir_username list(str)
+        #         idir_username list(str)
+        #         displayName list(str)
+        # if (('attributes' in user) and
+        #         'idir_username' in user['attributes']):
+        username = user['username']
+
+        if not email and not user:
+            msg = f'unable to extract email and username from this user: {user}'
+            raise ValueError(msg)
+
+        retVal = [username, email]
+
         return retVal
 
     def getUserProfile(self, userId):
