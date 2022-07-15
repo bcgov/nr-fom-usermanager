@@ -7,10 +7,13 @@ curl -v \
   -d "username=$KC_USERNAME" \
   -d "password=$KC_PASSWORD" \
   -d "grant_type=password" \
-  "$KC_HOST:8080/realms/master/protocol/openid-connect/token"
+  "$KC_HOST/realms/master/protocol/openid-connect/token"
 
-
-
+# get the config
+curl \
+"$KC_HOST/auth/realms/$KC_REALM/.well-known/openid-configuration"
+http://keycloakhost:keycloakport/auth/realms/{realm}/.well-known/openid-configuration
+https://oidc.gov.bc.ca/auth/realms/ichqx89w/.well-known/openid-configuration
 
 # WORKS! gets access token (JWT?)
 # and decodes it to json

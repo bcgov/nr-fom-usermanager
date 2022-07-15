@@ -1,5 +1,7 @@
 # Overview
 
+<img src="https://lh3.googleusercontent.com/pw/AM-JKLVQ3zIZBxbAlzoCsqFki5ndraAKWN0V39ChQO_Z70ILBbwtNZAwJkWUlGp4Rg0I7rUhB4Qi5qfM507gC6yafbQV-L9ni8LMBojAVi_EuF7mnaBz5SyWf0RMIUx7WVcSsGj6EsTBQ90zhxvaYqSTmVuA4Q=w1072-h804-no?authuser=0" width='600px'>
+
 The [Forest Operations Map](https://github.com/bcgov/nr-fom-api) application
 supports the ability for licensees to authenticate / login to the application.
 Authentication is handled using OIDC.  The application in its current site
@@ -16,6 +18,39 @@ This repository contains the code for a simple command line based tool. That
 will make it easy to add new users to the FOM application.
 
 # Setup
+
+## Run setup script
+
+### Download the install script from [here](https://raw.githubusercontent.com/bcgov/nr-fom-usermanager/main/fom_shell.sh)
+
+```
+# download the file:
+curl https://raw.githubusercontent.com/bcgov/nr-fom-usermanager/main/fom_shell.sh -o fom_shell.sh
+
+# edit line 5 adding the keycloak secret
+
+# make the file executable
+chmod +x fom_shell.sh
+
+# install deps
+./fom_user.sh
+
+# run fomuser
+fomuser
+```
+
+## Return and re-run
+
+```
+# set up the virtualenv
+./fom_user.sh
+
+# run fomuser
+fomuser
+```
+
+
+# Older Instructions - hopefully replaced by above
 
 ## define the following env vars
 
@@ -35,8 +70,15 @@ KC_FOM_CLIENTID=<the kc client that fom app uses to authenticate against>
 
 ```
 python3 -m venv venvfom
-source ./venvfom/bin/activate
+source ./venv/bin/activate
 pip install FOMUserUtil
+```
+
+## Re-use Venv after install
+
+```
+source ./venv/bin/activate
+fomuser
 ```
 
 # Using the CLI tool
