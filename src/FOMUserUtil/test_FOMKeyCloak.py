@@ -51,7 +51,6 @@ class Test_FOMKeyCloak:
             retVal = fomKeyCloak_fixture.getMatchingUsersWithRoleMapping(testString)
             LOGGER.debug(f"userroles: {retVal}")
 
-
     def test_addRoleToUser(self, fomKeyCloak_fixture):
         fomKeyCloak_fixture.addRoleToUser('kjnether@idir', '99999999')
 
@@ -80,13 +79,16 @@ class Test_FOMKeyCloak:
         usersCnt = fomKeyCloak_fixture.getUserCount()
         LOGGER.debug(f"total users in sys: {usersCnt}")
 
+    def test_getUserPage(self, fomKeyCloak_fixture):
+        users = fomKeyCloak_fixture.getUserPage(230, 20)
+        usersCnt = len(users)
+        LOGGER.debug(f"returned: {usersCnt}")
 
 
 
 @pytest.fixture
 def fomKeyCloak_fixture():
     return FOMKeyCloak.FomKeycloak()
-
 
 @pytest.fixture
 def userNames_fixtures():

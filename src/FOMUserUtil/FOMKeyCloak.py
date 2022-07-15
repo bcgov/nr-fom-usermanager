@@ -206,7 +206,6 @@ class FomKeycloak:
         # TODO: this is quick and dirty, could consider implementing a search
         #      in the api call for a specific user instead of returning all the
         #      users and then parsing that list
-        url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/users"  # noqa
 
         userCnt = self.getUserCount()
         LOGGER.debug(f"userCnt: {userCnt}")
@@ -217,12 +216,7 @@ class FomKeycloak:
         userData = []
 
         while len(userData) < userCnt:
-
-            params = {"realm-name": constants.KC_HOST, 'max': max,
-                      'first': first}
-            response = requests.get(url=url, params=params,
-                                    headers=self.defaultheaders)
-            respData = response.json()
+            respData = self.getUserPage(first, max)
             userData.extend(respData)
             LOGGER.debug(f"first: {first}, userdata cnt: {len(userData)} " +
                          f"usercount: {userCnt}")
@@ -230,6 +224,16 @@ class FomKeycloak:
 
         LOGGER.debug(f"users returned: {len(userData)}")
         return userData
+
+    def getUserPage(self, first, max):
+        url = f"{constants.KC_HOST}/auth/admin/realms/{constants.KC_REALM}/users"  # noqa
+        params = {"realm-name": constants.KC_HOST, 'max': max,
+                    'first': first}
+        response = requests.get(url=url, params=params,
+                                headers=self.defaultheaders)
+        respData = response.json()
+        LOGGER.debug(f"status code: {response.status_code}")
+        return respData
 
     def isValidUser(self, userid):
         """validates that the user provided exists in keycloak, and that the
