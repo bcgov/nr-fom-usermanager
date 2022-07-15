@@ -79,14 +79,14 @@ KC_FOM_CLIENTID=<the kc client that fom app uses to authenticate against>
 
 ```
 python3 -m venv venvfom
-source ./venv/bin/activate
+source ./venvfom/bin/activate
 pip install FOMUserUtil
 ```
 
 ## Re-use Venv after install
 
 ```
-source ./venv/bin/activate
+source ./venvfom/bin/activate
 fomuser
 ```
 
