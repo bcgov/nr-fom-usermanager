@@ -34,15 +34,15 @@ will make it easy to add new users to the FOM application.
 
 ```
 # download the file:
-curl https://raw.githubusercontent.com/bcgov/nr-fom-usermanager/main/fom_shell.sh -o fom_shell.sh
+curl https://raw.githubusercontent.com/bcgov/nr-fom-usermanager/main/util/mgr_shell.sh -o mgr_shell.sh
 
 # edit line 5 adding the keycloak secret
 
 # make the file executable
-chmod +x fom_shell.sh
+chmod +x mgr_shell.sh
 
 # install deps
-./fom_user.sh
+util/mgr_shell.sh
 
 # run fomuser
 fomuser
@@ -52,7 +52,7 @@ fomuser
 
 ```
 # set up the virtualenv
-./fom_user.sh
+util/mgr_shell.sh
 
 # run fomuser
 fomuser

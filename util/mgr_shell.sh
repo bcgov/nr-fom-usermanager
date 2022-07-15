@@ -24,9 +24,15 @@ export KC_ENV=prod
 
 
 # Env
-python -m venv venv
-which pip || python -m pip install --upgrade pip
-pip install FOMUserUtil
+if [ ! -d venvfom ]
+then
+    python -m venv venvfom
+    . ./venvfom/bin/activate
+    which pip || python -m pip install --upgrade pip
+    pip install FOMUserUtil
+else
+    source ./venvfom/bin/activate
+fi
 
 # Instructions
 echo -e "\n"
