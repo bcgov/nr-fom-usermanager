@@ -36,12 +36,12 @@ class Test_FOMKeyCloak:
     def test_getUserProfile(self, fomKeyCloak_fixture):
         #users = fomKeyCloak_fixture.getMatchingUsers('huhs', False)
         #LOGGER.debug(f"userData: {users}")
-        id = 'f5956310-cfab-4bf5-86f1-ba2bf47a576f'
+        id = 'a8646348-24f7-4222-ad48-1e201be124bd'
         profile = fomKeyCloak_fixture.getUserProfile(id)
         LOGGER.debug(f"profile: {profile}")
 
     def test_getFOMUserRoleMappings(self, fomKeyCloak_fixture):
-        id = 'f5956310-cfab-4bf5-86f1-ba2bf47a576f'
+        id = 'a8646348-24f7-4222-ad48-1e201be124bd'
         mappings = fomKeyCloak_fixture.getFOMUserRoleMappings(id)
         LOGGER.debug(f"profile: {mappings}")
 
