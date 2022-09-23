@@ -186,3 +186,8 @@ to keycloak.  At the moment this is accomplished using the GUI.
     * view-users
 
 
+# Development
+
+* before pushing new versions, be sure to increment the version in the files:
+  * src/FOMUserUtil/__init__.py
+  * setup.cfg
