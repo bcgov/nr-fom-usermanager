@@ -1,5 +1,5 @@
 python-dotenv==0.20.0
-requests==2.28.1
+requests==2.28.2
 
 # if and when pr is accepted / merged using my fork
 keycloak-wrapper==0.2
