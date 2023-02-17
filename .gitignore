@@ -17,3 +17,5 @@ src/FOMUserUtil.egg-info
 src/junk.py
 src/FOMUserXlSync/msal_tokenCache.bin
 venv*
+build/
+VERDSION.txt
