@@ -5,7 +5,7 @@
 [![Stargazers](https://img.shields.io/github/stars/bcgov/nr-fom-usermanager)](/../../stargazers)
 [![Issues](https://img.shields.io/github/issues/bcgov/nr-fom-usermanager)](/../../issues)
 [![MIT License](https://img.shields.io/github/license/bcgov/nr-fom-usermanager.svg)](/LICENSE.md)
-[![Lifecycle](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
+[![Lifecycle:Retired](https://img.shields.io/badge/Lifecycle-Retired-d45500)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
 
 # Overview
 
